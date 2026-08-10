@@ -4891,6 +4891,13 @@
             .brightness-option-value { font-size: 9.5px; }
         }
     </style>
+    <!-- PWA 配置 -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#060612">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="霓虹财富">
+    <link rel="apple-touch-icon" href="./icon-192.png">
 </head>
 <body>
     <!-- 智能亮度调节叠加层 -->
@@ -10784,5 +10791,17 @@
         </span>
         <span class="app-dl-text">App下载</span>
     </a>
+    <!-- 注册 Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then((registration) => {
+                    console.log('[PWA] Service Worker 注册成功:', registration.scope);
+                }).catch((err) => {
+                    console.warn('[PWA] Service Worker 注册失败:', err);
+                });
+            });
+        }
+    </script>
 </body>
 </html>
