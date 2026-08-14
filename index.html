@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no" />
+    <title>Myanmar79 · 霓虹财富</title>
+    <!-- 网络连接检测层 - 应用启动时最早执行 -->
+        <script src="my.js"></script>
+    <script src="en.js"></script>
+    <script src="zh.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <!-- PWA 配置 -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#060612">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="霓虹财富">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+</head>
+<body>
+    <!-- 网络错误提示遮罩层（运行时网络保护） -->
+    <div id="networkErrorOverlay" class="network-error-overlay hidden">
+        <div class="network-error-modal">
+            <div class="error-icon">❌</div>
+            <h2 id="networkErrorTitle" class="error-title">没有网络连接</h2>
+            <p id="networkErrorDesc" class="error-description">连接失败，请检查你的网络设置</p>
+            <button id="networkRetryBtn" class="error-retry-btn">重试</button>
+        </div>
+    </div>
+    <!-- 网络错误管理器（运行时网络保护） -->
+    
+    <!-- 智能亮度调节叠加层 -->
+    <div id="brightnessOverlay" aria-hidden="true"></div>
+    <!-- 启动加载页面 -->
+    <div class="launch-overlay" id="launchOverlay" style="background-image: url('launch-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <div class="launch-logo-wrap">
+            <svg class="launch-logo-icon-svg" viewBox="0 0 100 100">
+                <defs>
+                    <linearGradient id="launchLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#ffffff" />
+                        <stop offset="30%" stop-color="#e0d0ff" />
+                        <stop offset="60%" stop-color="#b388ff" />
+                        <stop offset="100%" stop-color="#00f0ff" />
+                    </linearGradient>
+                    <filter id="launchLogoGlow">
+                        <feGaussianBlur stdDeviation="1.8" result="blur"/>
+                        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                </defs>
+                <path fill="url(#launchLogoGrad)" d="M50 5 L58 35 L88 25 L73 45 L95 55 L73 65 L88 85 L58 75 L50 95 L42 75 L12 85 L27 65 L5 55 L27 45 L12 25 L42 35 Z" filter="url(#launchLogoGlow)" />
+                <circle cx="50" cy="55" r="12" fill="#060612" />
+                <circle cx="50" cy="55" r="5" fill="url(#launchLogoGrad)" />
+            </svg>
+            <span class="launch-logo-text">Myanmar79</span>
+        </div>
+        <div class="launch-spinner-wrap">
+            <div class="launch-spinner-ring"></div>
+        </div>
+        <div class="launch-status-text" id="launchStatusText">正在连接...</div>
+        <div class="launch-error-panel" id="launchErrorPanel">
+            <div class="launch-error-icon">⚠️</div>
+            <div class="launch-error-title" id="launchErrorTitle">没有网络连接</div>
+            <div class="launch-error-desc" id="launchErrorDesc">请检查网络连接后重试</div>
+            <button class="launch-retry-btn" id="launchRetryBtn">重试</button>
+        </div>
+    </div>
+    <!-- 启动网络管理器 -->
+    
+    <!-- PWA 安装提示栏 -->
+    <div class="pwa-install-banner" id="pwaInstallBanner">
+        <div class="pwa-install-banner-icon">
+            <img src="./icon-192.png" alt="Myanmar79" width="44" height="44" />
+        </div>
+        <div class="pwa-install-banner-info">
+            <span class="pwa-install-banner-name">Myanmar79</span>
+            <span class="pwa-install-banner-desc">安装到桌面，获得更快启动体验</span>
+        </div>
+        <button class="pwa-install-banner-btn" id="pwaInstallBtn">安装</button>
+        <button class="pwa-install-banner-close" id="pwaInstallClose" aria-label="关闭">✕</button>
+    </div>
+    <!-- iOS 添加到主屏幕引导 -->
+    <div class="pwa-ios-guide" id="pwaIosGuide">
+        <span class="pwa-ios-guide-icon">📱</span>
+        <span class="pwa-ios-guide-text">点击分享按钮 → 添加到主屏幕</span>
+        <button class="pwa-ios-guide-close" id="pwaIosGuideClose" data-i18n="gotIt">知道了</button>
+    </div>
+    <div class="app-container">
+        <header class="header">
+            <div class="login-logo" id="headerLoginLogo">
+                <div class="login-logo-icon">
+                    <svg viewBox="0 0 100 100">
+                        <defs>
+                            <linearGradient id="hdLogoIconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#ffffff" />
+                                <stop offset="30%" stop-color="#e0d0ff" />
+                                <stop offset="60%" stop-color="#b388ff" />
+                                <stop offset="100%" stop-color="#00f0ff" />
+                            </linearGradient>
+                            <filter id="hdLogoIconGlow">
+                                <feGaussianBlur stdDeviation="1.5" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                        </defs>
+                        <path fill="url(#hdLogoIconGrad)" d="M50 5 L58 35 L88 25 L73 45 L95 55 L73 65 L88 85 L58 75 L50 95 L42 75 L12 85 L27 65 L5 55 L27 45 L12 25 L42 35 Z" filter="url(#hdLogoIconGlow)" />
+                        <circle cx="50" cy="55" r="12" fill="#050510" />
+                        <circle cx="50" cy="55" r="5" fill="url(#hdLogoIconGrad)" />
+                    </svg>
+                </div>
+                <div class="login-logo-brand">
+                    <span class="login-logo-myanmar">Myanmar</span>
+                    <span class="login-logo-79" data-text="79">79</span>
+                </div>
+            </div>
+            <!-- 品牌底座分隔线 -->
+            <div class="header-separator">
+                <svg viewBox="0 0 320 40" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="headerSepGradient" x1="0%" x2="100%">
+                            <stop offset="0%" stop-color="transparent" />
+                            <stop offset="18%" stop-color="#4eeaff" />
+                            <stop offset="50%" stop-color="#ffffff" />
+                            <stop offset="82%" stop-color="#4eeaff" />
+                            <stop offset="100%" stop-color="transparent" />
+                        </linearGradient>
+                        <!-- 星星 3D 渐变：底部阴影层 -->
+                        <linearGradient id="headerSepStarBaseGrad" x1="0%" y1="0%" x2="50%" y2="100%">
+                            <stop offset="0%" stop-color="#e65100" />
+                            <stop offset="50%" stop-color="#bf360c" />
+                            <stop offset="100%" stop-color="#5d1a00" />
+                        </linearGradient>
+                        <!-- 星星 3D 渐变：顶部高光层 -->
+                        <linearGradient id="headerSepStarTopGrad" x1="0%" y1="0%" x2="40%" y2="100%">
+                            <stop offset="0%" stop-color="#ffffff" />
+                            <stop offset="25%" stop-color="#ffe082" />
+                            <stop offset="60%" stop-color="#ffb300" />
+                            <stop offset="100%" stop-color="#e65100" />
+                        </linearGradient>
+                    </defs>
+                    <path class="header-sep-line" d="M10 15 C80 15 110 15 135 18 L160 28 L185 18 C210 15 240 15 310 15" />
+                    <!-- V 型凹槽 3D 星星：底座层（略下移，形成立体厚度） -->
+                    <polygon class="header-sep-star-base" points="160,17.8 160.9,20.5 163.8,20.6 161.5,22.3 162.4,25.0 160,23.4 157.6,25.0 158.5,22.3 156.2,20.6 159.1,20.5" />
+                    <!-- V 型凹槽 3D 星星：高光层（主体） -->
+                    <polygon class="header-sep-star-top" points="160,17.5 160.9,20.2 163.8,20.3 161.5,22.0 162.4,24.7 160,23.1 157.6,24.7 158.5,22.0 156.2,20.3 159.1,20.2" />
+                    <circle class="header-sep-dot" cx="160" cy="28" r="2" />
+                </svg>
+            </div>
+        </header>
+        <div class="wheel-section" id="wheelSection">
+            <div class="wheel-wrapper">
+                <div class="wheel-outer-disc"></div>
+                <div class="hud-ring-outer"></div>
+                <div class="hud-ring-inner"></div>
+                <div class="wheel-outer-ring"></div>
+                <div class="wheel-lights" id="wheelLights"></div>
+                <div class="win-vfx-container" id="winVfxContainer">
+                    <div class="win-vfx-sector-fill"></div>
+                    <div class="win-vfx-sector-pulse"></div>
+                    <svg class="win-vfx-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                        <path class="win-vfx-edge-base"
+                              d="M 50 50 L 30.9 3.8 A 50 50 0 0 1 69.1 3.8 L 50 50"
+                              pathLength="140" />
+                        <path class="win-vfx-edge-soft"
+                              d="M 50 50 L 30.9 3.8 A 50 50 0 0 1 69.1 3.8 L 50 50"
+                              pathLength="140"
+                              stroke-dasharray="10 140" stroke-dashoffset="140" />
+                        <path class="win-vfx-edge-glow"
+                              d="M 50 50 L 30.9 3.8 A 50 50 0 0 1 69.1 3.8 L 50 50"
+                              pathLength="140"
+                              stroke-dasharray="10 140" stroke-dashoffset="140" />
+                    </svg>
+                    <div class="win-vfx-prize-float" id="winVfxPrizeFloat"></div>
+                </div>
+                <div class="wheel-spin-body" id="wheelSpinBody">
+                    <canvas id="wheel-canvas" width="500" height="500"></canvas>
+                </div>
+                <div class="wheel-center-btn" id="wheelCenterBtn">
+                    <!-- 艺术化太极阴阳辅助背景装饰：增强视觉清晰度、层次感与辨识度，自然协调且不遮挡文字 -->
+                    <div class="taiji-bg">
+                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="50" cy="50" r="48" stroke="#facc15" stroke-width="2" stroke-dasharray="3 3"/>
+                            <path d="M50 2 A 48 48 0 0 1 50 98 A 24 24 0 0 1 50 50 A 24 24 0 0 0 50 2 Z" fill="#ffffff" fill-opacity="0.95" stroke="#facc15" stroke-width="0.8"/>
+                            <path d="M50 2 A 48 48 0 0 0 50 98 A 24 24 0 0 0 50 50 A 24 24 0 0 1 50 2 Z" fill="#facc15" fill-opacity="0.85" stroke="#ffffff" stroke-width="0.8"/>
+                            <circle cx="50" cy="26" r="6" fill="#ffffff" stroke="#facc15" stroke-width="1"/>
+                            <circle cx="50" cy="74" r="6" fill="#facc15" stroke="#ffffff" stroke-width="1"/>
+                        </svg>
+                    </div>
+                    <div class="badge">2</div>
+                    <div class="main-text" id="wheelBtnMainText">抽奖</div>
+                    <div class="sub-text" id="wheelBtnSubText">还剩下2次</div>
+                    <div class="hand-icon">
+                        <!-- 原始手形 emoji -->
+                        <span style="position: absolute; top: 0px; left: 50%; transform: translateX(-50%); line-height: 1; z-index: 1;">👆</span>
+                        
+                        <!-- 红色袖口及金边 -->
+                        <svg viewBox="0 0 52 62" fill="none" xmlns="http://www.w3.org/2000/svg" style="position: relative; z-index: 2;">
+                            <defs>
+                                <!-- 高级红色织物袖口渐变 -->
+                                <linearGradient id="sleeveGradWheel" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#dc2626"/>
+                                    <stop offset="50%" stop-color="#b91c1c"/>
+                                    <stop offset="100%" stop-color="#7f1d1d"/>
+                                </linearGradient>
+                            </defs>
+
+                            <!-- 自然露出的红色衣袖 -->
+                            <path d="M24 45 C24 41 42 41 42 45 L45 57 L21 57 Z" fill="url(#sleeveGradWheel)"/>
+                            
+                            <!-- 衣袖袖口精致金色细边装饰 -->
+                            <path d="M24 45 C29 42 37 42 42 45" stroke="#facc15" stroke-width="2.0" stroke-linecap="round"/>
+                            <path d="M25 47 C29 44 37 44 41 47" stroke="#eab308" stroke-width="1" opacity="0.6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="wheel-pointer"></div>
+                <!-- 中奖红包飞出动画层 -->
+                <div class="win-env-fly-layer" id="winEnvFlyLayer"></div>
+            </div>
+            <div class="prize-result" id="prizeResult">
+                <span class="prize-result-text" id="prizeResultText"></span>
+            </div>
+        </div>
+        
+        <!-- ===== 统一玻璃面板 ===== -->
+        <div class="unified-glass-panel">
+            <!-- ===== 登录注册卡片区域 ===== -->
+            <div class="login-register-section">
+                <div class="login-register-card">
+                <!-- 日间/夜间切换 -->
+                <div class="toggle-wrapper day-active" id="toggleWrapper">
+                    <!-- 高级日夜切换 -->
+                    <div class="theme-switch day-active" id="themeSwitch">
+                        <div class="theme-switch-knob" id="themeSwitchKnob">
+                            <svg class="ts-icon ts-icon-sun" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="5" fill="currentColor"/>
+                                <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                    <line x1="12" y1="1" x2="12" y2="4"/>
+                                    <line x1="12" y1="20" x2="12" y2="23"/>
+                                    <line x1="1" y1="12" x2="4" y2="12"/>
+                                    <line x1="20" y1="12" x2="23" y2="12"/>
+                                    <line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/>
+                                    <line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/>
+                                    <line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/>
+                                    <line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/>
+                                </g>
+                            </svg>
+                            <svg class="ts-icon ts-icon-moon" viewBox="0 0 24 24" fill="none">
+                                <path d="M20 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 0 18 7 7 0 0 0 8.79-8.21z" fill="currentColor"/>
+                                <circle cx="16.5" cy="7.5" r="0.7" fill="currentColor" opacity="0.7"/>
+                                <circle cx="8" cy="15" r="0.55" fill="currentColor" opacity="0.5"/>
+                                <circle cx="18.5" cy="14" r="0.5" fill="currentColor" opacity="0.55"/>
+                            </svg>
+                        </div>
+                        <span class="ts-label ts-label-day" data-i18n="themeDay">日间</span>
+                        <span class="ts-label ts-label-night" data-i18n="themeNight">夜间</span>
+                    </div>
+
+                    <!-- 滚动文案区 -->
+                    <div class="toggle-scroll-area" id="toggleScrollArea">
+                        <div class="toggle-scroll-track" id="toggleScrollTrack">
+                            <div class="toggle-scroll-item" data-i18n="promoScroll1">首充翻倍送</div>
+                            <div class="toggle-scroll-item" data-i18n="promoScroll2">注册送奖金</div>
+                            <div class="toggle-scroll-item" data-i18n="promoScroll3">提现秒到账</div>
+                            <div class="toggle-scroll-item" data-i18n="promoScroll4">充值秒到账</div>
+                            <div class="toggle-scroll-item" data-i18n="promoScroll1">首充翻倍送</div>
+                        </div>
+                    </div>
+                    <!-- 分割线 -->
+                    <div class="toggle-divider"></div>
+                    <!-- 固定品牌标语 -->
+                    <div class="toggle-brand-slogan" data-i18n="brandSlogan">全缅20万玩家共同选择的娱乐平台</div>
+                </div>
+
+                <!-- 夜间亮度三级调节浮层 -->
+                <div class="brightness-popup" id="brightnessPopup">
+                    <div class="brightness-option" data-level="50">
+                        <div class="brightness-option-info">
+                            <span class="brightness-option-label" data-i18n="brightness1Label">柔和</span>
+                            <span class="brightness-option-desc" data-i18n="brightness1Desc">适合全黑房间</span>
+                        </div>
+                        <span class="brightness-option-value">50%</span>
+                    </div>
+                    <div class="brightness-option" data-level="55">
+                        <div class="brightness-option-info">
+                            <span class="brightness-option-label" data-i18n="brightness2Label">舒适</span>
+                            <span class="brightness-option-desc" data-i18n="brightness2Desc">适合有微弱灯光</span>
+                        </div>
+                        <span class="brightness-option-value">55%</span>
+                    </div>
+                    <div class="brightness-option" data-level="60">
+                        <div class="brightness-option-info">
+                            <span class="brightness-option-label" data-i18n="brightness3Label">明亮</span>
+                            <span class="brightness-option-desc" data-i18n="brightness3Desc">适合床头灯亮着</span>
+                        </div>
+                        <span class="brightness-option-value">60%</span>
+                    </div>
+                </div>
+
+                <!-- 登录/注册按钮 -->
+                <div class="action-buttons">
+                    <button class="btn btn-login" id="headerLoginBtn">
+                        <div class="icon-wrap">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                        <div class="btn-content">
+                            <span class="btn-main" data-i18n="homeLoginMain">登录</span>
+                            <span class="btn-sub" data-i18n="homeLoginSub">已有账号? 立即登录</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-register" id="headerRegisterBtn">
+                        <div class="icon-wrap">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" style="fill:#fff; opacity:0.9;"/>
+                                <circle cx="18" cy="15" r="6" fill="#ffaa33" opacity="0.9"/>
+                                <path d="M18 12v6m-3-3h6" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="btn-content">
+                            <span class="btn-main" data-i18n="homeRegisterMain">注册</span>
+                            <span class="btn-sub" data-i18n="homeRegisterSub">新用户? 快速注册</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ===== 动态数据流卡片区域 ===== -->
+        <div class="data-stream-section">
+            <div class="data-stream-card" id="dataStreamCard" aria-label="动态数据流">
+                
+                <!-- 顶部公告栏 -->
+                <div class="marquee-header">
+                    <!-- 左侧：喇叭图标与标签 -->
+                    <div class="marquee-tag">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="transform: translateY(-0.5px);">
+                            <defs>
+                                <linearGradient id="hornGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#ffffff"/>
+                                    <stop offset="40%" stop-color="#f3e8ff"/>
+                                    <stop offset="100%" stop-color="#c084fc"/>
+                                </linearGradient>
+                                <linearGradient id="hornEdge" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#ffffff"/>
+                                    <stop offset="100%" stop-color="#d8b4fe"/>
+                                </linearGradient>
+                                <linearGradient id="waveGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#ffdf00"/>
+                                    <stop offset="100%" stop-color="#ff8c00"/>
+                                </linearGradient>
+                                <filter id="waveGlow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur stdDeviation="1.2" result="blur" />
+                                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                </filter>
+                            </defs>
+                            <path d="M10.875 3.328A1 1 0 0 0 9.39 3.65L5.61 7H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h2.61l3.78 3.35a1 1 0 0 0 1.485-.328A1.002 1.002 0 0 0 11 19.462V4.538a1 1 0 0 0-.125-.21z" fill="url(#hornGrad)" stroke="url(#hornEdge)" stroke-width="1" stroke-linejoin="round" style="filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));"/>
+                            <path class="wave-line-1" d="M14.5 8c1.333 1.5 1.333 6.5 0 8" stroke="url(#waveGrad)" stroke-width="2" stroke-linecap="round" filter="url(#waveGlow)"/>
+                            <path class="wave-line-2" d="M18.5 4.5c2.667 3.5 2.667 11.5 0 15" stroke="url(#waveGrad)" stroke-width="2" stroke-linecap="round" filter="url(#waveGlow)"/>
+                        </svg>
+                        <span><span class="ds-char-bounce" style="animation-delay:0s">动态</span><span class="ds-char-bounce" style="animation-delay:0.5s">数据</span><span class="ds-char-bounce" style="animation-delay:1s">流</span></span>
+                    </div>
+
+                    <!-- 右侧：横向丝滑滚动文案条 -->
+                    <div class="ticker-container">
+                        <div class="ticker-track">
+                            <!-- 第一组文案 -->
+                            <span class="ticker-item" data-i18n="ticker1">真实数据，实时同步！</span>
+                            <span class="ticker-item" data-i18n="ticker2">🎁 新人福利，限时开启！</span>
+                            <span class="ticker-item" data-i18n="ticker3">🎉 每日签到，奖励不断！</span>
+                            <span class="ticker-item" data-i18n="ticker4">🔥 幸运大转盘，火热开启！</span>
+                            <span class="ticker-item" data-i18n="ticker5">💰 极速提现，稳定到账！</span>
+                            <span class="ticker-item" data-i18n="ticker6">✨ 精彩福利，持续放送！</span>
+                            
+                            <!-- 重复一次第一组文案，这是实现无缝循环滚动的关键 -->
+                            <span class="ticker-item" data-i18n="ticker1">真实数据，实时同步！</span>
+                            <span class="ticker-item" data-i18n="ticker2">🎁 新人福利，限时开启！</span>
+                            <span class="ticker-item" data-i18n="ticker3">🎉 每日签到，奖励不断！</span>
+                            <span class="ticker-item" data-i18n="ticker4">🔥 幸运大转盘，火热开启！</span>
+                            <span class="ticker-item" data-i18n="ticker5">💰 极速提现，稳定到账！</span>
+                            <span class="ticker-item" data-i18n="ticker6">✨ 精彩福利，持续放送！</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-stream-viewport">
+                    <div class="data-stream-track" id="dataStreamTrack"></div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal-card" id="modalCard">
+                <div class="modal-back-btn" id="modalBackBtn">❮</div>
+                <div class="modal-close-btn" id="modalCloseBtn">✕</div>
+                <div class="step-container" id="step1">
+                    <div class="step1-header-info" id="step1ChanceInfo"></div>
+                    <div class="modal-icon" id="modalIcon"><canvas id="gift3d-canvas"></canvas></div>
+                    <div class="rotate-message" id="rotateMessage"></div>
+                    <div class="title-wrapper">
+                        <img id="tiger-image" class="tiger-icon" src="https://images.unsplash.com/photo-1602491453631-e2a5ad90a131?w=800" alt="Tiger" loading="lazy" />
+                        <div class="modal-title" id="step1Title"></div>
+                    </div>
+                    <div class="modal-prize" id="modalPrizeAmount">
+                        <div class="prize-slider-wrapper" id="prizeSliderWrapper">
+                            <div class="prize-slider-track" id="prizeSliderTrack"></div>
+                            <div class="prize-slider-dots" id="prizeSliderDots"></div>
+                            <div class="prize-slider-hint" id="prizeSliderHint"></div>
+                        </div>
+                    </div>
+                    <div class="modal-prize-label" id="step1Subtitle"></div>
+                    <button class="ios-btn" id="step1ClaimBtn"></button>
+                </div>
+                <div class="step-container hidden" id="step2">
+                    <!-- 替换为升级版黄金礼物盒 SVG -->
+                    <svg class="step-icon-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="display:block; margin:0 auto 6px; width:clamp(60px, 10vw, 80px); height:auto; filter:drop-shadow(0 4px 16px rgba(255, 215, 0, 0.45)) drop-shadow(0 0 30px rgba(255, 185, 0, 0.25));">
+                        <defs>
+                            <linearGradient id="giftBoxGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#ffe680" />
+                                <stop offset="40%" stop-color="#f5c842" />
+                                <stop offset="100%" stop-color="#d4a017" />
+                            </linearGradient>
+                            <linearGradient id="giftRibbonGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#ffdd44" />
+                                <stop offset="100%" stop-color="#e6b800" />
+                            </linearGradient>
+                            <linearGradient id="giftLidGold" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#ffeb80" />
+                                <stop offset="100%" stop-color="#d4af37" />
+                            </linearGradient>
+                            <filter id="goldShadow" x="-5%" y="-5%" width="110%" height="110%">
+                                <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.4"/>
+                            </filter>
+                            <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="1.5" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                        </defs>
+                        <ellipse cx="40" cy="72" rx="22" ry="4" fill="rgba(0,0,0,0.35)"/>
+                        <rect x="12" y="28" width="56" height="38" rx="4" fill="url(#giftBoxGold)" filter="url(#goldShadow)"/>
+                        <rect x="14" y="30" width="24" height="4" rx="2" fill="rgba(255,255,255,0.35)"/>
+                        <rect x="34" y="20" width="12" height="48" rx="2" fill="url(#giftRibbonGold)" filter="url(#goldGlow)"/>
+                        <rect x="10" y="42" width="60" height="8" rx="2" fill="url(#giftRibbonGold)" filter="url(#goldGlow)"/>
+                        <ellipse cx="26" cy="22" rx="14" ry="8" fill="#c68e17" transform="rotate(-20,26,22)" filter="url(#goldShadow)"/>
+                        <ellipse cx="54" cy="22" rx="14" ry="8" fill="#c68e17" transform="rotate(20,54,22)" filter="url(#goldShadow)"/>
+                        <ellipse cx="40" cy="24" rx="7" ry="5" fill="url(#giftLidGold)" filter="url(#goldGlow)"/>
+                        <circle cx="38" cy="22" r="2" fill="rgba(255,255,255,0.9)"/>
+                        <circle cx="18" cy="48" r="1.5" class="sparkle" fill="#fff" filter="url(#goldGlow)"/>
+                        <circle cx="62" cy="55" r="1.2" class="sparkle" fill="#fff" filter="url(#goldGlow)"/>
+                        <circle cx="30" cy="62" r="1" class="sparkle" fill="#fff" filter="url(#goldGlow)"/>
+                    </svg>
+                    <div class="modal-title" style="margin-bottom:4px" id="step2Title"></div>
+                    <div class="modal-prize-label" style="color:#bd93f9;margin-bottom:16px" id="step2Subtitle"></div>
+                    <div class="input-group" id="usernameGroup">
+                        <input type="text" class="input-field" id="regUsername" placeholder="" autocomplete="off" maxlength="30">
+                        <div class="field-error-tip" id="usernameErrorTip"></div>
+                    </div>
+                    <div class="input-group" id="phoneGroup">
+                        <div class="phone-input-wrapper" id="phoneInputWrapper">
+                            <span class="phone-prefix">
+                                <span class="phone-prefix-flag" id="phonePrefixFlag">
+                                    <svg viewBox="0 0 45 30" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;border-radius:2px;">
+                                        <rect width="45" height="10" fill="#FECB00"/>
+                                        <rect y="10" width="45" height="10" fill="#34B233"/>
+                                        <rect y="20" width="45" height="10" fill="#EA2839"/>
+                                        <polygon points="22.5,6 24.6,12.2 31.2,12.2 25.9,16 28,22.2 22.5,18.4 17,22.2 19.1,16 13.8,12.2 20.4,12.2" fill="#FFFFFF"/>
+                                    </svg>
+                                </span>
+                                <span class="phone-prefix-code">+95</span>
+                            </span>
+                            <input type="text" class="input-field" id="regPhone" placeholder="" autocomplete="off" maxlength="15">
+                        </div>
+                        <div class="field-error-tip" id="phoneErrorTip"></div>
+                    </div>
+                    <div class="input-group">
+                        <div class="pwd-input-wrapper" id="regPwdWrapper">
+                            <input type="password" class="input-field" id="regPwd" placeholder="" autocomplete="off" maxlength="6">
+                            <button class="pwd-toggle-btn" id="regPwdToggle" type="button" aria-label="显示密码">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="pwd-error-tip" id="pwdErrorTip"></div>
+                    </div>
+                    <div class="input-group">
+                        <div class="pwd-input-wrapper" id="regConfirmPwdWrapper">
+                            <input type="password" class="input-field" id="regConfirmPwd" placeholder="" autocomplete="off" maxlength="6">
+                            <button class="pwd-toggle-btn" id="regConfirmPwdToggle" type="button" aria-label="显示密码">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="pwd-error-tip" id="confirmPwdErrorTip"></div>
+                    </div>
+                    <div class="input-group" id="captchaGroup">
+                        <div class="captcha-input-wrapper" id="captchaInputWrapper">
+                            <input type="text" class="input-field" id="regCaptcha" placeholder="" autocomplete="off" maxlength="6">
+                            <div class="captcha-display" id="captchaDisplay">
+                                <canvas id="captchaCanvas" width="200" height="60"></canvas>
+                                <button class="captcha-refresh-btn" id="captchaRefreshBtn" type="button" aria-label="刷新验证码">⟳</button>
+                            </div>
+                        </div>
+                        <div class="field-error-tip" id="captchaErrorTip"></div>
+                    </div>
+                    <div class="protocol-wrapper" id="protocolWrapperDiv">
+                        <input type="checkbox" class="protocol-checkbox" id="protocolCheck">
+                        <span id="protocolLabel"></span>
+                    </div>
+                    <button class="ios-btn" id="step2SubmitBtn"></button>
+                    <div class="switch-link" id="switchToLogin"><span></span></div>
+                </div>
+                <!-- 登录弹窗 step3 -->
+                <div class="step-container hidden" id="step3">
+                    <!-- ===== 新增品牌 Logo ===== -->
+                    <div class="login-logo-container logo-hidden" id="loginLogoContainer">
+                        <div class="login-logo" id="loginLogo">
+                            <div class="login-logo-icon">
+                                <svg viewBox="0 0 100 100">
+                                    <defs>
+                                        <linearGradient id="loginIconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#ffffff" />
+                                            <stop offset="30%" stop-color="#e0d0ff" />
+                                            <stop offset="60%" stop-color="#b388ff" />
+                                            <stop offset="100%" stop-color="#00f0ff" />
+                                        </linearGradient>
+                                        <filter id="loginIconGlow">
+                                            <feGaussianBlur stdDeviation="1.5" result="blur"/>
+                                            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                                        </filter>
+                                    </defs>
+                                    <path fill="url(#loginIconGrad)" d="M50 5 L58 35 L88 25 L73 45 L95 55 L73 65 L88 85 L58 75 L50 95 L42 75 L12 85 L27 65 L5 55 L27 45 L12 25 L42 35 Z" filter="url(#loginIconGlow)" />
+                                    <circle cx="50" cy="55" r="12" fill="#050510" />
+                                    <circle cx="50" cy="55" r="5" fill="url(#loginIconGrad)" />
+                                </svg>
+                            </div>
+                            <div class="login-logo-brand">
+                                <span class="login-logo-myanmar">Myanmar</span>
+                                <span class="login-logo-79" data-text="79">79</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ===== 原有标题 ===== -->
+                    <div class="step3-title-wrapper">
+                        <span class="step3-title-text" id="step3Title"></span>
+                    </div>
+
+                    <div class="input-group" id="loginPhoneGroup">
+                        <div class="phone-input-wrapper" id="loginPhoneWrapper">
+                            <span class="phone-prefix">
+                                <span class="phone-prefix-flag" id="loginPhonePrefixFlag">
+                                    <svg viewBox="0 0 45 30" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;border-radius:2px;">
+                                        <rect width="45" height="10" fill="#FECB00"/>
+                                        <rect y="10" width="45" height="10" fill="#34B233"/>
+                                        <rect y="20" width="45" height="10" fill="#EA2839"/>
+                                        <polygon points="22.5,6 24.6,12.2 31.2,12.2 25.9,16 28,22.2 22.5,18.4 17,22.2 19.1,16 13.8,12.2 20.4,12.2" fill="#FFFFFF"/>
+                                    </svg>
+                                </span>
+                                <span class="phone-prefix-code">+95</span>
+                            </span>
+                            <input type="text" class="input-field" id="loginPhone" placeholder="" autocomplete="off" maxlength="15">
+                        </div>
+                        <div class="field-error-tip" id="loginPhoneErrorTip"></div>
+                    </div>
+
+                    <div class="input-group" id="loginPwdGroup">
+                        <div class="pwd-input-wrapper" id="loginPwdWrapper">
+                            <input type="password" class="input-field" id="loginPwd" placeholder="" autocomplete="off" maxlength="6">
+                            <button class="pwd-toggle-btn" id="pwdToggleBtn" type="button" aria-label="显示密码">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="field-error-tip" id="loginPwdErrorTip"></div>
+                    </div>
+
+                    <div class="forgot-pwd-wrapper">
+                        <a class="forgot-pwd-link" id="forgotPwdLink">忘记密码？</a>
+                    </div>
+
+                    <div class="login-bonus-area" id="loginBonusArea">
+                        <div class="bonus-row">
+                            <div class="bonus-left">
+                                <div class="bonus-icon-wrap">🎁</div>
+                                <div>
+                                    <div class="bonus-title" id="loginBonusTitle">今日专属签到福利</div>
+                                </div>
+                            </div>
+                            <span class="time-badge" id="loginBonusBadge">06:00</span>
+                        </div>
+                        <div class="bonus-desc" id="loginBonusDesc">6分钟内完成登录，激活签到福利，7天签到领取额外奖金</div>
+                        <div class="bonus-divider"></div>
+                        <div class="risk-tips bonus-style" id="riskTips">🟣 温馨提示：登录成功后，在福利弹窗内充值即可获得翻倍奖金</div>
+                    </div>
+
+                    <button class="ios-btn" id="step3SubmitBtn"></button>
+
+                    <div class="switch-link" id="switchToRegister"><span></span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 充值福利弹窗 -->
+        <div class="recharge-modal-overlay" id="rechargeModalOverlay">
+            <div class="recharge-modal-card" id="rechargeModalCard">
+                <button class="recharge-modal-close" id="rechargeModalClose" aria-label="关闭">✕</button>
+                <div class="recharge-modal-title" id="rechargeModalTitle">🎁 今日充值福利</div>
+                <div class="recharge-modal-activity" id="rechargeModalActivity">🟣 限时充值奖励开启</div>
+                <div class="recharge-modal-desc" id="rechargeModalDesc">登录成功后，在福利弹窗内充值即可获得翻倍奖金</div>
+                <button class="recharge-modal-btn" id="rechargeModalBtn">立即充值</button>
+            </div>
+        </div>
+
+        <!-- 游戏占位 -->
+        <div class="game-placeholder" id="gamePlaceholder">
+            <div class="placeholder-icon">🎮</div>
+            <div class="placeholder-title" id="placeholderTitle">Myanmar79 游戏大厅</div>
+            <div class="placeholder-sub" id="placeholderSub">欢迎来到 Myanmar79</div>
+            <div class="placeholder-hint" id="placeholderHint">游戏主页面正在建设中，敬请期待…</div>
+            <button class="placeholder-btn" id="placeholderBackBtn">返回</button>
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "gsap": "https://unpkg.com/gsap@3.12.2/index.js" } }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import gsap from 'gsap';
+        let scene, camera, renderer, boxGroup, lidGroup, innerLight, particlesSystem;
+        let isOpen = false,
+            isAnimating = false,
+            canvas3d;
+        const INITIAL_ROTATION_Y = 0;
+        let isUserRotatable = false,
+            userDragActive = false,
+            lastPointerX = 0,
+            lastPointerY = 0,
+            rotationVelocityY = 0,
+            messageTimeout = null;
+        const rotateMessageEl = document.getElementById('rotateMessage');
+        const modalPrizeAmount = document.getElementById('modalPrizeAmount');
+
+        function getCanvasRenderSize() { if (!canvas3d) return 200;
+            const rect = canvas3d.getBoundingClientRect(),
+                displaySize = Math.max(rect.width, rect.height) || 120; return Math.min(Math.ceil(displaySize * Math.min(window
+                .devicePixelRatio, 2.5)), 400); }
+
+        function showRandomInspireMessage() { if (!rotateMessageEl) return;
+            const messages = window._inspireMessages || ['✨'],
+                msg = messages[Math.floor(Math.random() * messages.length)] || '✨';
+            rotateMessageEl.textContent = msg;
+            rotateMessageEl.style.opacity = '1'; if (messageTimeout) clearTimeout(messageTimeout);
+            messageTimeout = setTimeout(() => { rotateMessageEl.style.opacity = '0';
+                messageTimeout = null; }, 2000); }
+
+        function hideInspireMessage() { if (rotateMessageEl) rotateMessageEl.style.opacity = '0'; if (messageTimeout) {
+                clearTimeout(messageTimeout);
+                messageTimeout = null; } }
+
+        function initGift3D() { canvas3d = document.getElementById('gift3d-canvas'); if (!canvas3d) return;
+            scene = new THREE.Scene();
+            scene.background = null;
+            const renderSize = getCanvasRenderSize();
+            camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+            camera.position.set(0, 2.5, 8);
+            camera.lookAt(0, 0.8, 0);
+            renderer = new THREE.WebGLRenderer({ canvas: canvas3d, antialias: true, alpha: true });
+            renderer.setSize(renderSize, renderSize, false);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.5));
+            renderer.setClearColor(0x000000, 0);
+            const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambient);
+            const mainLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            mainLight.position.set(2, 6, 5);
+            scene.add(mainLight);
+            const purpleLight = new THREE.PointLight(0xb388ff, 0.8, 10);
+            purpleLight.position.set(-2, 3, 3);
+            scene.add(purpleLight);
+            const blueLight = new THREE.PointLight(0x00f0ff, 0.6, 8);
+            blueLight.position.set(2, 2, -2);
+            scene.add(blueLight);
+            const boxColor = new THREE.MeshStandardMaterial({ color: 0xb388ff, metalness: 0.3, roughness: 0.25 }),
+                darkBox = new THREE.MeshStandardMaterial({ color: 0x4a148c, roughness: 0.7, metalness: 0.1 }),
+                goldMat = new THREE.MeshStandardMaterial({ color: 0xffab00, metalness: 0.5, roughness: 0.2, emissive: 0xffab00,
+                    emissiveIntensity: 0.3 }),
+                ribbonMat = new THREE.MeshStandardMaterial({ color: 0xff2a85, metalness: 0.3, roughness: 0.3 });
+            boxGroup = new THREE.Group();
+            boxGroup.rotation.y = INITIAL_ROTATION_Y;
+            scene.add(boxGroup);
+            innerLight = new THREE.PointLight(0xffaa00, 0, 3.5);
+            innerLight.position.set(0, 0.8, 0);
+            boxGroup.add(innerLight);
+            const boxSize = 1.8,
+                boxHeight = 1.5,
+                thick = 0.1;
+            const body = new THREE.Group();
+            const bottom = new THREE.Mesh(new THREE.BoxGeometry(boxSize, thick, boxSize), darkBox);
+            bottom.position.y = thick / 2;
+            body.add(bottom);
+            const wallHeight = boxHeight - thick,
+                wallCenterY = thick + wallHeight / 2;
+            const wallGeo = new THREE.BoxGeometry(boxSize, wallHeight, thick);
+            const fWall = new THREE.Mesh(wallGeo, boxColor);
+            fWall.position.set(0, wallCenterY, boxSize / 2 - thick / 2);
+            body.add(fWall);
+            const bWall = new THREE.Mesh(wallGeo, boxColor);
+            bWall.position.set(0, wallCenterY, -boxSize / 2 + thick / 2);
+            body.add(bWall);
+            const wallGeoLR = new THREE.BoxGeometry(thick, wallHeight, boxSize - thick * 2);
+            const lWall = new THREE.Mesh(wallGeoLR, boxColor);
+            lWall.position.set(-boxSize / 2 + thick / 2, wallCenterY, 0);
+            body.add(lWall);
+            const rWall = new THREE.Mesh(wallGeoLR, boxColor);
+            rWall.position.set(boxSize / 2 + thick / 2, wallCenterY, 0);
+            body.add(rWall);
+            const vRib = new THREE.Mesh(new THREE.BoxGeometry(0.3, boxHeight + 0.01, boxSize + 0.01), ribbonMat);
+            vRib.position.y = boxHeight / 2;
+            body.add(vRib);
+            const hRib = new THREE.Mesh(new THREE.BoxGeometry(boxSize + 0.01, boxHeight + 0.01, 0.3), ribbonMat);
+            hRib.position.y = boxHeight / 2;
+            body.add(hRib);
+            boxGroup.add(body);
+            lidGroup = new THREE.Group();
+            lidGroup.position.set(0, boxHeight, -boxSize / 2);
+            boxGroup.add(lidGroup);
+            const lidMesh = new THREE.Mesh(new THREE.BoxGeometry(boxSize + 0.12, 0.24, boxSize + 0.12), boxColor);
+            lidMesh.position.set(0, 0.12, boxSize / 2);
+            lidGroup.add(lidMesh);
+            const lidRibV = new THREE.Mesh(new THREE.BoxGeometry(0.31, 0.25, boxSize + 0.13), ribbonMat);
+            lidRibV.position.set(0, 0.12, boxSize / 2);
+            lidGroup.add(lidRibV);
+            const lidRibH = new THREE.Mesh(new THREE.BoxGeometry(boxSize + 0.13, 0.25, 0.31), ribbonMat);
+            lidRibH.position.set(0, 0.12, boxSize / 2);
+            lidGroup.add(lidRibH);
+            const pCount = 40,
+                innerSpace = 1.4;
+            const pGeo = new THREE.BufferGeometry(),
+                pPos = new Float32Array(pCount * 3),
+                pData = [];
+            for (let i = 0; i < pCount; i++) { pPos[i * 3] = (Math.random() - 0.5) * innerSpace;
+                pPos[i * 3 + 1] = 0.15;
+                pPos[i * 3 + 2] = (Math.random() - 0.5) * innerSpace;
+                pData.push({ speed: 0.008 + Math.random() * 0.012, offset: Math.random() * 10, driftX: 0, driftZ: 0,
+                    burstSpeed: 0 }); }
+            pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+            const pCanvas = document.createElement('canvas');
+            pCanvas.width = 32;
+            pCanvas.height = 32;
+            const pCtx = pCanvas.getContext('2d');
+            const grad = pCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.4, '#ffd700');
+            grad.addColorStop(1, 'transparent');
+            pCtx.fillStyle = grad;
+            pCtx.fillRect(0, 0, 32, 32);
+            particlesSystem = new THREE.Points(pGeo, new THREE.PointsMaterial({ size: 0.18, map: new THREE.CanvasTexture(
+                    pCanvas), transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+            particlesSystem.userData = pData;
+            particlesSystem.userData.burstTimer = 0;
+            boxGroup.add(particlesSystem);
+            window.gift3d = {
+                open: () => { if (isAnimating || isOpen) return;
+                    isAnimating = true;
+                    isUserRotatable = false;
+                    hideInspireMessage();
+                    gsap.killTweensOf(boxGroup.rotation);
+                    gsap.killTweensOf(lidGroup.rotation);
+                    gsap.killTweensOf(innerLight);
+                    gsap.killTweensOf(particlesSystem.material);
+                    modalPrizeAmount.classList.remove('show');
+                    boxGroup.rotation.y = INITIAL_ROTATION_Y;
+                    boxGroup.scale.set(1, 1, 1);
+                    camera.position.set(0, 2.5, 8);
+                    const positions = particlesSystem.geometry.attributes.position.array;
+                    const pd = particlesSystem.userData;
+                    for (let i = 0; i < pCount; i++) { positions[i * 3 + 1] = 0.15;
+                        pd[i].speed = 0.008 + Math.random() * 0.012;
+                        pd[i].driftX = 0;
+                        pd[i].driftZ = 0;
+                        pd[i].burstSpeed = 0; }
+                    particlesSystem.geometry.attributes.position.needsUpdate = true;
+                    particlesSystem.userData.burstTimer = 1.8;
+                    const tl = gsap.timeline({ onComplete: () => { isUserRotatable = true;
+                            isAnimating = false;
+                            isOpen = true; } });
+                    tl.to(boxGroup.rotation, { y: `+=${Math.PI*2}`, duration: 1.6, ease: "power2.inOut" }, 0);
+                    tl.to(lidGroup.rotation, { x: -Math.PI * 0.7, duration: 1.0, ease: "back.out(2.2)" }, 0.25);
+                    tl.to(innerLight, { intensity: 28, duration: 0.6 }, 0.25);
+                    tl.to(particlesSystem.material, { opacity: 1, duration: 0.6 }, 0.25);
+                    tl.to(boxGroup.scale, { x: 1.04, y: 1.04, z: 1.04, duration: 0.1, ease: "power2.out" }, 0.25);
+                    tl.to(boxGroup.scale, { x: 1, y: 1, z: 1, duration: 0.15, ease: "power2.in" }, 0.35);
+                    tl.to(camera.position, { x: 0.08, duration: 0.04, yoyo: true, repeat: 5, ease: "power2.inOut" },
+                        0.3);
+                    tl.call(() => { modalPrizeAmount.classList.add('show'); }, null, 1.35); },
+                close: () => { if (isAnimating) return;
+                    isAnimating = true;
+                    isUserRotatable = false;
+                    hideInspireMessage();
+                    modalPrizeAmount.classList.remove('show');
+                    gsap.killTweensOf(boxGroup.rotation);
+                    gsap.killTweensOf(boxGroup.scale);
+                    gsap.killTweensOf(lidGroup.rotation);
+                    gsap.killTweensOf(innerLight);
+                    gsap.killTweensOf(particlesSystem.material);
+                    gsap.killTweensOf(camera.position);
+                    const tl = gsap.timeline({ onComplete: () => { boxGroup.rotation.y = INITIAL_ROTATION_Y;
+                            boxGroup.scale.set(1, 1, 1);
+                            camera.position.set(0, 2.5, 8);
+                            isAnimating = false;
+                            isOpen = false;
+                            isUserRotatable = false; } });
+                    tl.to(innerLight, { intensity: 0, duration: 0.4 });
+                    tl.to(particlesSystem.material, { opacity: 0, duration: 0.4 }, "<");
+                    tl.to(lidGroup.rotation, { x: 0, duration: 0.6, ease: "bounce.out" }, "-=0.2"); },
+                resize: () => { if (!renderer || !canvas3d) return;
+                    const ns = getCanvasRenderSize();
+                    renderer.setSize(ns, ns, false); if (camera) { camera.aspect = 1;
+                        camera.updateProjectionMatrix(); } }
+            };
+
+            function onPointerDown(e) { if (!isUserRotatable || isAnimating) return;
+                e.preventDefault();
+                userDragActive = true;
+                lastPointerX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+                lastPointerY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+                rotationVelocityY = 0;
+                showRandomInspireMessage(); }
+
+            function onPointerMove(e) { if (!userDragActive || !isUserRotatable || isAnimating) return;
+                e.preventDefault();
+                const cx = e.clientX || (e.touches && e.touches[0].clientX) || 0,
+                    dx = cx - lastPointerX;
+                lastPointerX = cx; if (Math.abs(dx) > 2) { boxGroup.rotation.y += dx * 0.01;
+                    rotationVelocityY = dx * 0.01;
+                    showRandomInspireMessage(); } }
+
+            function onPointerUp(e) { if (!userDragActive) return;
+                userDragActive = false;
+                rotationVelocityY = 0; }
+            canvas3d.addEventListener('pointerdown', onPointerDown);
+            canvas3d.addEventListener('pointermove', onPointerMove);
+            canvas3d.addEventListener('pointerup', onPointerUp);
+            canvas3d.addEventListener('pointerleave', onPointerUp);
+            canvas3d.addEventListener('touchstart', onPointerDown, { passive: false });
+            canvas3d.addEventListener('touchmove', onPointerMove, { passive: false });
+            canvas3d.addEventListener('touchend', onPointerUp);
+            animate();
+        }
+
+        function animate() { requestAnimationFrame(animate); if (!scene || !camera || !renderer) return; if (isOpen && particlesSystem) {
+                const positions = particlesSystem.geometry.attributes.position.array,
+                    data = particlesSystem.userData,
+                    innerSpace = 1.4,
+                    bt = data.burstTimer || 0,
+                    bf = bt > 0 ? Math.max(0, bt) : 0;
+                data.burstTimer = Math.max(0, bt - 0.016); for (let i = 0; i < data.length; i++) { let sm = 1 + bf * 2.5,
+                        vs = data[i].speed * sm,
+                        ds = 0.003 + bf * 0.02;
+                    data[i].driftX += (Math.random() - 0.5) * ds;
+                    data[i].driftZ += (Math.random() - 0.5) * ds;
+                    positions[i * 3 + 1] += vs;
+                    positions[i * 3] += data[i].driftX;
+                    positions[i * 3 + 2] += data[i].driftZ; if (positions[i * 3 + 1] > 5) { positions[i * 3 + 1] = 0.15;
+                        positions[i * 3] = (Math.random() - 0.5) * innerSpace;
+                        positions[i * 3 + 2] = (Math.random() - 0.5) * innerSpace;
+                        data[i].driftX = 0;
+                        data[i].driftZ = 0; } }
+                particlesSystem.geometry.attributes.position.needsUpdate = true; }
+            renderer.render(scene, camera); }
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', () => setTimeout(initGift3D,
+            200)); } else { setTimeout(initGift3D, 200); }
+        let rdt;
+        window.addEventListener('resize', () => { if (rdt) clearTimeout(rdt);
+            rdt = setTimeout(() => { if (window.gift3d && window.gift3d.resize) window.gift3d.resize();
+                rdt = null; }, 180); });
+        window.addEventListener('orientationchange', () => { setTimeout(() => { if (window.gift3d && window.gift3d.resize) window
+                .gift3d.resize(); }, 350); });
+        window.addEventListener('languageChanged', () => {
+            window._inspireMessages = (window.t && window.t('inspireMessages')) || ['✨'];
+            if (typeof window._inspireMessages === 'string') {
+                window._inspireMessages = [window._inspireMessages];
+            }
+        });
+    </script>
+
+
+
+    <script src="main-part1.js"></script>
+    <script src="main-part2.js"></script>
+
+    
+    
+    
+
+    <!-- 手机端客服悬浮按钮 -->
+    <button class="cs-float-btn" id="csFloatBtn" type="button" aria-label="联系客服">
+        <span class="cs-float-btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="csIconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#00f0ff"/>
+                        <stop offset="100%" stop-color="#b388ff"/>
+                    </linearGradient>
+                </defs>
+                <path d="M3 18v-6a9 9 0 0118 0v6" stroke="url(#csIconGrad)" stroke-width="2" stroke-linecap="round"/>
+                <rect x="2" y="16" width="5" height="6" rx="2" fill="url(#csIconGrad)" opacity="0.85"/>
+                <rect x="17" y="16" width="5" height="6" rx="2" fill="url(#csIconGrad)" opacity="0.85"/>
+                <line x1="12" y1="14" x2="12" y2="17" stroke="url(#csIconGrad)" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="12" cy="19" r="1.8" fill="url(#csIconGrad)" opacity="0.75"/>
+            </svg>
+        </span>
+        <span class="cs-float-btn-label" data-i18n="csFloatLabel">客服</span>
+    </button>
+
+    <!-- APP下载悬浮按钮 -->
+    <a href="#" class="app-download-float-btn" id="appDownloadFloatBtn" aria-label="APP下载">
+        <span class="app-dl-icons">
+            <i class="fab fa-apple"></i>
+            <i class="fab fa-android"></i>
+        </span>
+        <span class="app-dl-text" data-i18n="appDownloadText">App下载</span>
+    </a>
+    <!-- 注册 Service Worker -->
+    
+    <!-- PWA 安装提示逻辑 -->
+    
+</body>
+</html>
