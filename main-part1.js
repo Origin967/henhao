@@ -231,6 +231,8 @@
                 CHECK_URLS: ['./manifest.json', './icon-192.png'],
                 // 单个请求超时时间（毫秒）
                 REQUEST_TIMEOUT: 12000,
+                // 启动背景图最短展示时长（毫秒）：仅当网络正常且资源已就绪时生效，慢速网络/无网络不受此限制
+                LAUNCH_MIN_DISPLAY_MS: 2000,
                 // 慢网络阈值（毫秒）
                 SLOW_THRESHOLD: 5000,
                 // 状态文案更新时机（毫秒）
@@ -263,6 +265,7 @@
             var toastTimer = null;
             var toastEl = null;
             var launchWatchdog = null;
+            var minDisplayTimer = null;
 
             // ============================================================
             //  i18n 辅助函数（不依赖主脚本的 t() 提前到位）
@@ -502,16 +505,29 @@
                 setState(LAUNCH_STATE.LOADING);
                 updateStatusText('launch_loading');
 
-                // 短暂延迟后进入 READY 状态，给用户一个平滑的过渡感知
-                // 但不人为增加等待时间
-                setTimeout(function() {
+                // 仅当网络正常且核心资源已准备完成时才进入此流程。
+                // 规则：网络正常且资源已就绪时，launch-bg 至少展示约 2 秒再进入游戏；
+                //      若网络本身较慢（已超过 2 秒），则不再额外等待，立即进入；
+                //      绝不因为“2 秒到了”而绕过网络检测或资源加载。
+                if (isLaunchComplete) return;
+                var elapsed = Date.now() - startTime;
+                var remaining = CONFIG.LAUNCH_MIN_DISPLAY_MS - elapsed;
+                if (remaining <= 0) {
                     completeLaunch();
-                }, 300);
+                    return;
+                }
+                if (minDisplayTimer) { clearTimeout(minDisplayTimer); minDisplayTimer = null; }
+                minDisplayTimer = setTimeout(function() {
+                    minDisplayTimer = null;
+                    completeLaunch();
+                }, remaining);
             }
 
             function completeLaunch() {
                 // 清除看门狗
                 if (launchWatchdog) { clearTimeout(launchWatchdog); launchWatchdog = null; }
+                // 清除最短展示时长计时器
+                if (minDisplayTimer) { clearTimeout(minDisplayTimer); minDisplayTimer = null; }
                 // 解除启动锁，恢复原项目 CSS 控制
                 const appContainer = document.querySelector('.app-container');
                 const launchOverlay = document.querySelector('.launch-overlay');
@@ -557,6 +573,7 @@
             function handleOffline() {
                 if (isLaunchComplete) return;
                 if (launchWatchdog) { clearTimeout(launchWatchdog); launchWatchdog = null; }
+                if (minDisplayTimer) { clearTimeout(minDisplayTimer); minDisplayTimer = null; }
                 stopStatusTimer();
                 abortPendingRequest();
                 setState(LAUNCH_STATE.OFFLINE);
@@ -567,6 +584,7 @@
             function handleTimeout() {
                 if (isLaunchComplete) return;
                 if (launchWatchdog) { clearTimeout(launchWatchdog); launchWatchdog = null; }
+                if (minDisplayTimer) { clearTimeout(minDisplayTimer); minDisplayTimer = null; }
                 stopStatusTimer();
                 abortPendingRequest();
                 setState(LAUNCH_STATE.TIMEOUT);
@@ -577,6 +595,7 @@
             function handleNetworkError() {
                 if (isLaunchComplete) return;
                 if (launchWatchdog) { clearTimeout(launchWatchdog); launchWatchdog = null; }
+                if (minDisplayTimer) { clearTimeout(minDisplayTimer); minDisplayTimer = null; }
                 stopStatusTimer();
                 abortPendingRequest();
                 setState(LAUNCH_STATE.ERROR);
@@ -592,6 +611,7 @@
                 hideErrorPanel();
                 stopStatusTimer();
                 abortPendingRequest();
+                if (minDisplayTimer) { clearTimeout(minDisplayTimer); minDisplayTimer = null; }
                 // 重置状态，重新开始
                 startLaunchSequence();
             }
@@ -716,6 +736,7 @@
                 window.addEventListener('beforeunload', function() {
                     stopStatusTimer();
                     abortPendingRequest();
+                    if (minDisplayTimer) { clearTimeout(minDisplayTimer); minDisplayTimer = null; }
                 });
             }
 
