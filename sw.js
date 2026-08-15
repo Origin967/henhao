@@ -1,12 +1,13 @@
 // Service Worker for Myanmar79 · 霓虹财富 PWA
-// 版本 v2：网络优先 + 缓存兜底，避免旧缓存优先策略导致更新后页面无法刷新
-const CACHE_NAME = 'myanmar79-cache-v2';
+// 版本 v3：网络优先 + 缓存兜底，避免旧缓存优先策略导致更新后页面无法刷新
+const CACHE_NAME = 'myanmar79-cache-v3';
 
 // 需要预缓存的资源列表（以当前项目实际文件为准）
 const PRE_CACHE_URLS = [
     './index.html',
     './manifest.json',
-    './icon-192.png'
+    './icon-192.png',
+    './icon-512.png'
 ];
 
 // 安装事件：预缓存核心资源
