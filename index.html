@@ -7,20 +7,22 @@
     <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no" />
     <title>Myanmar79</title>
+    <!-- 关键内联样式：确保首帧背景即为 #0b1a30，与系统启动画面自然衔接，避免白屏闪现 -->
+    <style>
+        html, body { background: #0b1a30; }
+    </style>
     <!-- 预加载启动背景图：确保点击 App 图标后立即进入 launch-bg.jpg，避免图标闪现/白屏/黑屏 -->
     <link rel="preload" as="image" href="./launch-bg.jpg" />
-    <!-- 网络连接检测层 - 应用启动时最早执行 -->
-        <script src="my.js"></script>
-    <script src="en.js"></script>
-    <script src="zh.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 字体图标库异步加载：不阻塞首屏渲染与 launch-bg.jpg 的显示 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     <link rel="stylesheet" href="style.css">
     <!-- 站点 favicon 图标 -->
     <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
     <!-- PWA 配置 -->
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#060612">
+    <meta name="theme-color" content="#0b1a30">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Myanmar79">
@@ -908,6 +910,10 @@
 
 
 
+    <!-- 语言资源脚本：需在 main-part1.js 之前加载（已从 <head> 移至此处，避免阻塞首屏渲染与 launch-bg.jpg 的显示） -->
+    <script src="my.js"></script>
+    <script src="en.js"></script>
+    <script src="zh.js"></script>
     <script src="main-part1.js"></script>
     <script src="main-part2.js"></script>
 
