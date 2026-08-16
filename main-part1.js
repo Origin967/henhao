@@ -506,7 +506,7 @@
                 updateStatusText('launch_loading');
 
                 // 仅当网络正常且核心资源已准备完成时才进入此流程。
-                // 规则：网络正常且资源已就绪时，launch-bg 至少展示约 2 秒再进入游戏；
+                // 规则：网络正常且资源已就绪时，splash-1080x1920.png 至少展示约 2 秒再进入游戏；
                 //      若网络本身较慢（已超过 2 秒），则不再额外等待，立即进入；
                 //      绝不因为“2 秒到了”而绕过网络检测或资源加载。
                 if (isLaunchComplete) return;
@@ -546,23 +546,19 @@
                 abortPendingRequest();
                 setState(LAUNCH_STATE.READY);
 
-                // 平滑过渡：先淡出，再移除
+                // 平滑过渡：先淡出，再从 DOM 移除
                 if (overlayEl) {
                     overlayEl.classList.add('launch-hidden');
-                    // 过渡完成后彻底移除
-                    var onTransitionEnd = function() {
-                        if (overlayEl) {
-                            overlayEl.classList.add('launch-removed');
+                    // 过渡完成后从 DOM 彻底移除
+                    var removeOverlay = function() {
+                        if (overlayEl && overlayEl.parentNode) {
+                            overlayEl.parentNode.removeChild(overlayEl);
                         }
-                        overlayEl.removeEventListener('transitionend', onTransitionEnd);
+                        overlayEl.removeEventListener('transitionend', removeOverlay);
                     };
-                    overlayEl.addEventListener('transitionend', onTransitionEnd);
-                    // 兜底：如果 transitionend 未触发
-                    setTimeout(function() {
-                        if (overlayEl && !overlayEl.classList.contains('launch-removed')) {
-                            overlayEl.classList.add('launch-removed');
-                        }
-                    }, 700);
+                    overlayEl.addEventListener('transitionend', removeOverlay);
+                    // 兜底：如果 transitionend 未触发，也要移除
+                    setTimeout(removeOverlay, 600);
                 }
 
                 // 通知游戏主脚本：网络已就绪

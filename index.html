@@ -11,9 +11,9 @@
     <style>
         html, body { background: #0b1a30; }
     </style>
-    <!-- 预加载启动背景图：确保点击 App 图标后立即进入 launch-bg.jpg，避免图标闪现/白屏/黑屏 -->
-    <link rel="preload" as="image" href="./launch-bg.jpg" />
-    <!-- 字体图标库异步加载：不阻塞首屏渲染与 launch-bg.jpg 的显示 -->
+    <!-- 预加载启动背景图：确保点击 App 图标后立即进入 splash-1080x1920.png，避免图标闪现/白屏/黑屏 -->
+    <link rel="preload" as="image" href="./splash-1080x1920.png" />
+    <!-- 字体图标库异步加载：不阻塞首屏渲染与 splash-1080x1920.png 的显示 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     <link rel="stylesheet" href="style.css">
@@ -43,7 +43,7 @@
     <!-- 智能亮度调节叠加层 -->
     <div id="brightnessOverlay" aria-hidden="true"></div>
     <!-- 启动加载页面 -->
-    <div class="launch-overlay" id="launchOverlay" style="background-image: url('launch-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="launch-overlay" id="launchOverlay" style="background-image: url('splash-1080x1920.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
         <div class="launch-logo-wrap">
             <svg class="launch-logo-icon-svg" viewBox="0 0 100 100">
                 <defs>
@@ -910,7 +910,7 @@
 
 
 
-    <!-- 语言资源脚本：需在 main-part1.js 之前加载（已从 <head> 移至此处，避免阻塞首屏渲染与 launch-bg.jpg 的显示） -->
+    <!-- 语言资源脚本：需在 main-part1.js 之前加载（已从 <head> 移至此处，避免阻塞首屏渲染与 splash-1080x1920.png 的显示） -->
     <script src="my.js"></script>
     <script src="en.js"></script>
     <script src="zh.js"></script>

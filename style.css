@@ -4981,13 +4981,13 @@
             align-items: center;
             justify-content: center;
             gap: clamp(16px, 2.5vh, 28px);
-            transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: var(--font-display);
         }
         .launch-overlay.launch-hidden {
             opacity: 0 !important;
             pointer-events: none !important;
-            transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .launch-overlay.launch-removed {
             display: none !important;

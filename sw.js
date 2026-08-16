@@ -1,15 +1,13 @@
 // Service Worker for Myanmar79 · 霓虹财富 PWA
-// 版本 v4：网络优先 + 缓存兜底，预缓存新增 Maskable 图标
-const CACHE_NAME = 'myanmar79-cache-v4';
+// 版本 v5：网络优先 + 缓存兜底，预缓存核心图标资源
+const CACHE_NAME = 'myanmar79-cache-v5';
 
 // 需要预缓存的资源列表（以当前项目实际文件为准）
 const PRE_CACHE_URLS = [
     './index.html',
     './manifest.json',
     './icon-192.png',
-    './icon-512.png',
-    './icon-192-maskable.png',
-    './icon-512-maskable.png'
+    './icon-512.png'
 ];
 
 // 安装事件：预缓存核心资源
