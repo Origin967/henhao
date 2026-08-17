@@ -1,6 +1,34 @@
 
     (function() {
         'use strict';
+        // ============================================================
+        //  首次进入游戏：浏览器语言自动识别
+        //  仅在本地未保存语言时执行一次，保持现有语言切换逻辑不变。
+        //  中文 -> 简体中文(zh)；缅甸语 -> 缅甸语(my)；英文 -> English(en)；
+        //  无法识别或其它语言 -> 缅甸语(my)。
+        // ============================================================
+        try {
+            var _savedLang = localStorage.getItem('myanmar79_lang');
+            if (_savedLang && (_savedLang === 'my' || _savedLang === 'en' || _savedLang === 'zh')) return;
+        } catch (e) {}
+
+        var _initialLang = 'my';
+        try {
+            var _lang = String(navigator.language || '').toLowerCase();
+            if (_lang.indexOf('zh') === 0) {
+                _initialLang = 'zh';
+            } else if (_lang.indexOf('my') === 0 || _lang.indexOf('bur') === 0) {
+                _initialLang = 'my';
+            } else if (_lang.indexOf('en') === 0) {
+                _initialLang = 'en';
+            }
+        } catch (e) {}
+
+        try { localStorage.setItem('myanmar79_lang', _initialLang); } catch (e) {}
+    })();
+
+    (function() {
+        'use strict';
         // 存储网络状态
         window.NetworkStatus = {
             isOnline: navigator.onLine,
